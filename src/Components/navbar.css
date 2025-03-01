@@ -1,0 +1,119 @@
+.navbar {
+  background-color: white;
+  border-bottom: 1px solid #d1d5db;
+  padding: 10px 20px;
+
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100px;
+  gap: 9px;
+
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo-img {
+  height: 30px;
+  margin-right: 10px;
+}
+
+.logo-text {
+  font-size: 32px;
+  font-weight: bold;
+  color: black;
+}
+
+/* Menu Button */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  color: #333;
+}
+
+/* Navigation Menu */
+.nav-menu {
+  display: flex;
+}
+
+.nav-list {
+  list-style: none;
+  display: flex;
+  padding: 0;
+  margin: 0;
+  gap: 3px;
+}
+
+.nav-list li {
+  margin: 0 10px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: black;
+  font-size: 24px;
+  font-weight: 700;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.nav-link:hover {
+  background-color: #e5e7eb;
+  color: #1d4ed8;
+}
+
+.active {
+  color: #1d4ed8;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-menu {
+    display: none;
+    flex-direction: column;
+    background: white;
+    width: 100%;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    padding: 10px;
+    border-top: 1px solid #d1d5db;
+  }
+
+  .nav-list {
+    flex-direction: column;
+  }
+
+  .nav-list li {
+    margin: 10px 0;
+  }
+
+  .nav-menu.show {
+    display: flex;
+  }
+}
