@@ -3,7 +3,7 @@ import email_icon from "../images/email.png";
 import password_icon from "../images/password.png";
 import person_icon from "../images/person.png";
 import { useState } from "react";
-
+import Header from "./Header";
 function Login() {
   const [action, setAction] = useState("Login");
   
@@ -130,6 +130,7 @@ function Login() {
   };
 
   return (
+
     <div className="Container">
       <div className="Header">
         <div className="text">{action}</div>

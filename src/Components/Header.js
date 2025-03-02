@@ -1,11 +1,12 @@
 import "./navbar.css";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="navbar">
-      <div className="container">
+    <nav className="h-navbar">
+      <div className="nv-container">
         <a href="https://flowbite.com/" className="logo">
           <img
             src="https://flowbite.com/docs/images/logo.svg"
@@ -34,9 +35,11 @@ const Header = () => {
         <div className={`nav-menu ${isOpen ? "show" : ""}`}>
           <ul className="nav-list">
             <li>
+            <Link to="/">
               <a href="#" className="nav-link active">
                 Home
               </a>
+              </Link>
             </li>
             <li>
               <a href="#" className="nav-link">

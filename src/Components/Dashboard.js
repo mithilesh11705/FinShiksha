@@ -1,370 +1,358 @@
 import React, { useState } from 'react';
 import { 
-  ChevronDown, 
-  ChevronUp, 
-  User, 
-  CreditCard, 
   BarChart3, 
-  PieChart, 
+  Users, 
+  BookOpen, 
   DollarSign, 
-  Clock, 
-  Bell, 
+  FileText, 
   Settings, 
-  LogOut, 
-  Menu 
+  Bell, 
+  Calendar, 
+  CreditCard, 
+  PieChart,
+  Home,
+  Menu,
+  X,
+  User,
+  LogOut
 } from 'lucide-react';
 
-const FinanceDashboard = () => {
-  const [activeSection, setActiveSection] = useState('overview');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [dropdownOpen, setDropdownOpen] = useState({
-    dashboard: true,
-    accounts: false,
-    investments: false,
-    settings: false
-  });
+const FinancialDashboard = ({ userType = "admin" }) => {
+  const [activePage, setActivePage] = useState("dashboard");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Mock user data
-  const userData = {
-    name: "Alex Johnson",
-    email: "alex.johnson@example.com",
-    accountBalance: 24890.75,
-    savings: 12450.30,
-    investments: 43250.80,
-    recentTransactions: [
-      { id: 1, merchant: "Amazon", amount: -79.99, date: "Feb 28, 2025", category: "Shopping" },
-      { id: 2, merchant: "Salary Deposit", amount: 3500.00, date: "Feb 27, 2025", category: "Income" },
-      { id: 3, merchant: "Starbucks", amount: -5.45, date: "Feb 26, 2025", category: "Food" },
-      { id: 4, merchant: "Electric Bill", amount: -124.37, date: "Feb 25, 2025", category: "Utilities" }
+  // Different navigation options based on user type
+  const navItems = {
+    admin: [
+      { id: "dashboard", label: "Dashboard", icon: <Home size={20} /> },
+      { id: "students", label: "Students", icon: <Users size={20} /> },
+      { id: "finances", label: "Finances", icon: <DollarSign size={20} /> },
+      { id: "reports", label: "Reports", icon: <FileText size={20} /> },
+      { id: "payments", label: "Payments", icon: <CreditCard size={20} /> },
+      { id: "analytics", label: "Analytics", icon: <BarChart3 size={20} /> },
+      { id: "settings", label: "Settings", icon: <Settings size={20} /> },
     ],
-    upcomingBills: [
-      { id: 1, name: "Rent", amount: 1800.00, dueDate: "Mar 5, 2025" },
-      { id: 2, name: "Car Insurance", amount: 145.50, dueDate: "Mar 15, 2025" },
-      { id: 3, name: "Internet", amount: 79.99, dueDate: "Mar 10, 2025" }
+    student: [
+      { id: "dashboard", label: "Dashboard", icon: <Home size={20} /> },
+      { id: "tuition", label: "Tuition", icon: <DollarSign size={20} /> },
+      { id: "payments", label: "Payments", icon: <CreditCard size={20} /> },
+      { id: "courses", label: "Courses", icon: <BookOpen size={20} /> },
+      { id: "calendar", label: "Calendar", icon: <Calendar size={20} /> },
     ],
-    investmentPerformance: [
-      { name: "Stocks", value: 25500.50, change: +2.4 },
-      { name: "Bonds", value: 10750.30, change: +0.7 },
-      { name: "Crypto", value: 7000.00, change: -1.2 }
+    parent: [
+      { id: "dashboard", label: "Dashboard", icon: <Home size={20} /> },
+      { id: "children", label: "Children", icon: <Users size={20} /> },
+      { id: "payments", label: "Payments", icon: <CreditCard size={20} /> },
+      { id: "statements", label: "Statements", icon: <FileText size={20} /> },
+      { id: "calendar", label: "Calendar", icon: <Calendar size={20} /> },
     ]
   };
 
-  const toggleDropdown = (section) => {
-    setDropdownOpen({
-      ...dropdownOpen,
-      [section]: !dropdownOpen[section]
-    });
+  // User profile information
+  const userProfiles = {
+    admin: { name: "Admin User", role: "System Administrator" },
+    student: { name: "Student User", role: "Engineering, Year 3" },
+    parent: { name: "Parent User", role: "Parent of 2 Students" }
   };
 
-  // Card component for reusability
-  const Card = ({ title, children, className }) => (
-    <div className={`bg-white rounded-lg shadow p-4 ${className}`}>
-      <h2 className="text-xl font-semibold mb-4">{title}</h2>
-      {children}
+  // Dashboard card components
+  const DashboardCard = ({ title, value, icon, color }) => (
+    <div className="bg-white rounded-lg shadow p-4 flex items-center">
+      <div className={`rounded-full p-3 mr-4 ${color}`}>
+        {icon}
+      </div>
+      <div>
+        <h3 className="text-gray-500 text-sm">{title}</h3>
+        <p className="text-2xl font-bold">{value}</p>
+      </div>
     </div>
   );
 
-  return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Mobile menu toggle */}
-      <button 
-        className="md:hidden fixed top-4 left-4 z-50 bg-blue-600 text-white p-2 rounded-md"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-      >
-        <Menu size={20} />
-      </button>
-
-      {/* Sidebar */}
-      <div className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 fixed md:static w-64 h-full bg-white shadow-lg z-40`}>
-        {/* User profile section */}
-        <div className="p-4 border-b">
-          <div className="flex items-center space-x-3">
-            <div className="bg-blue-600 text-white p-2 rounded-full">
-              <User size={24} />
+  // Placeholder content for dashboard
+  const renderDashboardContent = () => {
+    if (userType === "admin") {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <DashboardCard title="Total Students" value="5,240" icon={<Users size={24} color="white" />} color="bg-blue-500" />
+          <DashboardCard title="Monthly Revenue" value="$320,580" icon={<DollarSign size={24} color="white" />} color="bg-green-500" />
+          <DashboardCard title="Outstanding Balance" value="$42,150" icon={<CreditCard size={24} color="white" />} color="bg-yellow-500" />
+          
+          <div className="col-span-1 md:col-span-2 bg-white rounded-lg shadow p-4">
+            <h2 className="font-bold text-lg mb-4">Financial Overview</h2>
+            <div className="h-64 flex items-center justify-center border border-gray-200 rounded bg-gray-50">
+              <p className="text-gray-400">Financial chart placeholder</p>
             </div>
-            <div>
-              <h2 className="font-bold">{userData.name}</h2>
-              <p className="text-sm text-gray-500">{userData.email}</p>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow p-4">
+            <h2 className="font-bold text-lg mb-4">Upcoming Payments</h2>
+            <div className="space-y-3">
+              <div className="p-3 border rounded-lg">
+                <p className="font-medium">Spring Semester Tuition</p>
+                <p className="text-sm text-gray-500">Due in 15 days</p>
+              </div>
+              <div className="p-3 border rounded-lg">
+                <p className="font-medium">Faculty Payroll</p>
+                <p className="text-sm text-gray-500">Due in 3 days</p>
+              </div>
+              <div className="p-3 border rounded-lg">
+                <p className="font-medium">Library Fees</p>
+                <p className="text-sm text-gray-500">Due in 20 days</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="col-span-1 md:col-span-3 bg-white rounded-lg shadow p-4">
+            <h2 className="font-bold text-lg mb-4">Recent Transactions</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className="py-2 px-4 text-left">ID</th>
+                    <th className="py-2 px-4 text-left">Student</th>
+                    <th className="py-2 px-4 text-left">Type</th>
+                    <th className="py-2 px-4 text-left">Date</th>
+                    <th className="py-2 px-4 text-right">Amount</th>
+                    <th className="py-2 px-4 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...Array(5)].map((_, i) => (
+                    <tr key={i} className="border-b">
+                      <td className="py-2 px-4">TRX-{1000 + i}</td>
+                      <td className="py-2 px-4">Student {i + 1}</td>
+                      <td className="py-2 px-4">{["Tuition", "Fees", "Books", "Housing", "Meal Plan"][i]}</td>
+                      <td className="py-2 px-4">Mar {i + 1}, 2025</td>
+                      <td className="py-2 px-4 text-right">${(1000 * (i + 1)).toLocaleString()}</td>
+                      <td className="py-2 px-4 text-center">
+                        <span className={`px-2 py-1 rounded-full text-xs ${i % 2 === 0 ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}>
+                          {i % 2 === 0 ? "Completed" : "Pending"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
+      );
+    } else if (userType === "student") {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <DashboardCard title="Tuition Balance" value="$2,450" icon={<DollarSign size={24} color="white" />} color="bg-red-500" />
+          <DashboardCard title="Scholarship" value="$5,000" icon={<BookOpen size={24} color="white" />} color="bg-green-500" />
+          
+          <div className="col-span-1 md:col-span-2 bg-white rounded-lg shadow p-4">
+            <h2 className="font-bold text-lg mb-4">Payment Schedule</h2>
+            <div className="space-y-3">
+              <div className="p-3 border rounded-lg flex justify-between items-center">
+                <div>
+                  <p className="font-medium">Spring Tuition</p>
+                  <p className="text-sm text-gray-500">Due Mar 15, 2025</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold">$1,250</p>
+                  <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                    Upcoming
+                  </span>
+                </div>
+              </div>
+              <div className="p-3 border rounded-lg flex justify-between items-center">
+                <div>
+                  <p className="font-medium">Lab Fees</p>
+                  <p className="text-sm text-gray-500">Due Apr 5, 2025</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold">$350</p>
+                  <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                    Upcoming
+                  </span>
+                </div>
+              </div>
+              <div className="p-3 border rounded-lg flex justify-between items-center">
+                <div>
+                  <p className="font-medium">Library Fees</p>
+                  <p className="text-sm text-gray-500">Due Feb 15, 2025</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold">$75</p>
+                  <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                    Paid
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="col-span-1 md:col-span-2 bg-white rounded-lg shadow p-4">
+            <h2 className="font-bold text-lg mb-4">Financial Aid Overview</h2>
+            <div className="h-64 flex items-center justify-center border border-gray-200 rounded bg-gray-50">
+              <p className="text-gray-400">Financial aid chart placeholder</p>
+            </div>
+          </div>
+        </div>
+      );
+    } else if (userType === "parent") {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <DashboardCard title="Children Enrolled" value="2" icon={<Users size={24} color="white" />} color="bg-purple-500" />
+          <DashboardCard title="Total Balance" value="$4,850" icon={<DollarSign size={24} color="white" />} color="bg-blue-500" />
+          
+          <div className="col-span-1 md:col-span-2 bg-white rounded-lg shadow p-4">
+            <h2 className="font-bold text-lg mb-4">Children's Accounts</h2>
+            <div className="space-y-3">
+              <div className="p-3 border rounded-lg flex justify-between items-center">
+                <div>
+                  <p className="font-medium">Emma Johnson</p>
+                  <p className="text-sm text-gray-500">Grade 10, ID: ST10234</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold">$2,350 Balance</p>
+                  <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                    Payment Due
+                  </span>
+                </div>
+              </div>
+              <div className="p-3 border rounded-lg flex justify-between items-center">
+                <div>
+                  <p className="font-medium">Michael Johnson</p>
+                  <p className="text-sm text-gray-500">Grade 8, ID: ST10235</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold">$2,500 Balance</p>
+                  <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                    Payment Due
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="col-span-1 md:col-span-2 bg-white rounded-lg shadow p-4">
+            <h2 className="font-bold text-lg mb-4">Payment History</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className="py-2 px-4 text-left">Date</th>
+                    <th className="py-2 px-4 text-left">Child</th>
+                    <th className="py-2 px-4 text-left">Description</th>
+                    <th className="py-2 px-4 text-right">Amount</th>
+                    <th className="py-2 px-4 text-center">Receipt</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...Array(3)].map((_, i) => (
+                    <tr key={i} className="border-b">
+                      <td className="py-2 px-4">Feb {15 - i*5}, 2025</td>
+                      <td className="py-2 px-4">{i % 2 === 0 ? "Emma Johnson" : "Michael Johnson"}</td>
+                      <td className="py-2 px-4">{["Tuition Payment", "Book Fees", "Activity Fees"][i]}</td>
+                      <td className="py-2 px-4 text-right">${(500 * (i + 1)).toLocaleString()}</td>
+                      <td className="py-2 px-4 text-center">
+                        <button className="text-blue-500 hover:underline">View</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  };
 
-        {/* Navigation links */}
+  return (
+    <div className="flex h-screen bg-gray-100">
+      {/* Mobile sidebar toggle */}
+      <button 
+        className="md:hidden fixed z-50 top-4 left-4 p-2 rounded-md bg-blue-600 text-white"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      >
+        {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+      
+      {/* Sidebar */}
+      <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 fixed md:relative z-40 w-64 h-full bg-gray-800 overflow-y-auto`}>
+        {/* Logo and school name */}
+        <div className="flex items-center justify-center h-16 bg-gray-900 text-white">
+          <DollarSign size={24} className="mr-2" />
+          <h1 className="text-xl font-bold">FinEdu Admin</h1>
+        </div>
+        
+        {/* User profile */}
+        <div className="p-4 border-b border-gray-700">
+          <div className="flex items-center space-x-3">
+            <div className="bg-gray-600 p-2 rounded-full">
+              <User size={24} className="text-white" />
+            </div>
+            <div className="text-white">
+              <p className="font-medium">{userProfiles[userType].name}</p>
+              <p className="text-sm text-gray-400">{userProfiles[userType].role}</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Navigation */}
         <nav className="p-4">
           <ul className="space-y-2">
-            {/* Dashboard Section */}
-            <li>
-              <button 
-                onClick={() => toggleDropdown('dashboard')} 
-                className="flex items-center justify-between w-full p-2 rounded hover:bg-gray-100"
-              >
-                <div className="flex items-center">
-                  <BarChart3 size={18} className="mr-2" />
-                  <span>Dashboard</span>
-                </div>
-                {dropdownOpen.dashboard ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              </button>
-              
-              {dropdownOpen.dashboard && (
-                <ul className="pl-6 mt-2 space-y-1">
-                  <li>
-                    <button 
-                      onClick={() => setActiveSection('overview')}
-                      className={`w-full text-left p-2 rounded ${activeSection === 'overview' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}`}
-                    >
-                      Overview
-                    </button>
-                  </li>
-                  <li>
-                    <button 
-                      onClick={() => setActiveSection('analytics')}
-                      className={`w-full text-left p-2 rounded ${activeSection === 'analytics' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}`}
-                    >
-                      Analytics
-                    </button>
-                  </li>
-                </ul>
-              )}
-            </li>
-
-            {/* Accounts Section */}
-            <li>
-              <button 
-                onClick={() => toggleDropdown('accounts')} 
-                className="flex items-center justify-between w-full p-2 rounded hover:bg-gray-100"
-              >
-                <div className="flex items-center">
-                  <CreditCard size={18} className="mr-2" />
-                  <span>Accounts</span>
-                </div>
-                {dropdownOpen.accounts ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              </button>
-              
-              {dropdownOpen.accounts && (
-                <ul className="pl-6 mt-2 space-y-1">
-                  <li>
-                    <button 
-                      onClick={() => setActiveSection('transactions')}
-                      className={`w-full text-left p-2 rounded ${activeSection === 'transactions' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}`}
-                    >
-                      Transactions
-                    </button>
-                  </li>
-                  <li>
-                    <button 
-                      onClick={() => setActiveSection('bills')}
-                      className={`w-full text-left p-2 rounded ${activeSection === 'bills' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}`}
-                    >
-                      Bills
-                    </button>
-                  </li>
-                </ul>
-              )}
-            </li>
-
-            {/* Investments Section */}
-            <li>
-              <button 
-                onClick={() => toggleDropdown('investments')} 
-                className="flex items-center justify-between w-full p-2 rounded hover:bg-gray-100"
-              >
-                <div className="flex items-center">
-                  <PieChart size={18} className="mr-2" />
-                  <span>Investments</span>
-                </div>
-                {dropdownOpen.investments ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              </button>
-              
-              {dropdownOpen.investments && (
-                <ul className="pl-6 mt-2 space-y-1">
-                  <li>
-                    <button 
-                      onClick={() => setActiveSection('portfolio')}
-                      className={`w-full text-left p-2 rounded ${activeSection === 'portfolio' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}`}
-                    >
-                      Portfolio
-                    </button>
-                  </li>
-                  <li>
-                    <button 
-                      onClick={() => setActiveSection('performance')}
-                      className={`w-full text-left p-2 rounded ${activeSection === 'performance' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}`}
-                    >
-                      Performance
-                    </button>
-                  </li>
-                </ul>
-              )}
-            </li>
-
-            {/* Settings Section */}
-            <li>
-              <button 
-                onClick={() => toggleDropdown('settings')} 
-                className="flex items-center justify-between w-full p-2 rounded hover:bg-gray-100"
-              >
-                <div className="flex items-center">
-                  <Settings size={18} className="mr-2" />
-                  <span>Settings</span>
-                </div>
-                {dropdownOpen.settings ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              </button>
-              
-              {dropdownOpen.settings && (
-                <ul className="pl-6 mt-2 space-y-1">
-                  <li>
-                    <button 
-                      onClick={() => setActiveSection('account')}
-                      className={`w-full text-left p-2 rounded ${activeSection === 'account' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}`}
-                    >
-                      Account
-                    </button>
-                  </li>
-                  <li>
-                    <button 
-                      onClick={() => setActiveSection('security')}
-                      className={`w-full text-left p-2 rounded ${activeSection === 'security' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}`}
-                    >
-                      Security
-                    </button>
-                  </li>
-                  <li>
-                    <button 
-                      onClick={() => setActiveSection('notifications')}
-                      className={`w-full text-left p-2 rounded ${activeSection === 'notifications' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}`}
-                    >
-                      Notifications
-                    </button>
-                  </li>
-                </ul>
-              )}
-            </li>
-
-            <li>
-              <button className="flex items-center w-full p-2 rounded hover:bg-gray-100 text-red-500">
-                <LogOut size={18} className="mr-2" />
-                <span>Sign Out</span>
+            {navItems[userType].map(item => (
+              <li key={item.id}>
+                <button
+                  className={`flex items-center w-full p-2 rounded-md text-left ${activePage === item.id ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}
+                  onClick={() => setActivePage(item.id)}
+                >
+                  <span className="mr-3">{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              </li>
+            ))}
+            
+            <li className="pt-4 mt-4 border-t border-gray-700">
+              <button className="flex items-center w-full p-2 rounded-md text-left text-gray-300 hover:bg-gray-700">
+                <LogOut size={20} className="mr-3" />
+                <span>Logout</span>
               </button>
             </li>
           </ul>
         </nav>
       </div>
-
+      
       {/* Main content */}
-      <div className="flex-1 overflow-auto p-4 md:p-6">
-        {/* Top bar with search and notifications */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">{activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}</h1>
+      <div className="flex-1 overflow-x-hidden overflow-y-auto">
+        {/* Top bar */}
+        <header className="bg-white shadow h-16 flex items-center justify-between px-6">
+          <h2 className="text-xl font-semibold capitalize">
+            {activePage}
+          </h2>
+          
           <div className="flex items-center space-x-4">
-            <button className="relative p-2 rounded-full hover:bg-gray-100">
+            <button className="p-2 rounded-full hover:bg-gray-100 relative">
               <Bell size={20} />
-              <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center">3</span>
+              <span className="absolute top-0 right-0 bg-red-500 rounded-full w-4 h-4 text-xs text-white flex items-center justify-center">3</span>
+            </button>
+            
+            <button className="p-2 rounded-full hover:bg-gray-100">
+              <Settings size={20} />
             </button>
           </div>
-        </div>
-
-        {/* Dashboard content - conditionally render based on active section */}
-        {activeSection === 'overview' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Account Summary */}
-            <Card title="Account Summary" className="md:col-span-2">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <div className="flex items-center mb-2">
-                    <DollarSign size={20} className="text-blue-600 mr-2" />
-                    <span className="text-sm text-gray-500">Total Balance</span>
-                  </div>
-                  <p className="text-2xl font-bold">${userData.accountBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <div className="flex items-center mb-2">
-                    <DollarSign size={20} className="text-green-600 mr-2" />
-                    <span className="text-sm text-gray-500">Savings</span>
-                  </div>
-                  <p className="text-2xl font-bold">${userData.savings.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
-                </div>
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <div className="flex items-center mb-2">
-                    <PieChart size={20} className="text-purple-600 mr-2" />
-                    <span className="text-sm text-gray-500">Investments</span>
-                  </div>
-                  <p className="text-2xl font-bold">${userData.investments.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
-                </div>
-              </div>
-            </Card>
-
-            {/* Upcoming Bills */}
-            <Card title="Upcoming Bills">
-              <ul className="space-y-3">
-                {userData.upcomingBills.map(bill => (
-                  <li key={bill.id} className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">{bill.name}</p>
-                      <p className="text-sm text-gray-500">Due {bill.dueDate}</p>
-                    </div>
-                    <span className="font-semibold">${bill.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-
-            {/* Recent Transactions */}
-            <Card title="Recent Transactions" className="md:col-span-2">
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-2">Merchant</th>
-                      <th className="text-left py-2">Category</th>
-                      <th className="text-left py-2">Date</th>
-                      <th className="text-right py-2">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {userData.recentTransactions.map(transaction => (
-                      <tr key={transaction.id} className="border-b hover:bg-gray-50">
-                        <td className="py-3">{transaction.merchant}</td>
-                        <td className="py-3">{transaction.category}</td>
-                        <td className="py-3">{transaction.date}</td>
-                        <td className={`py-3 text-right ${transaction.amount < 0 ? 'text-red-600' : 'text-green-600'}`}>
-                          {transaction.amount < 0 ? '-' : '+'}${Math.abs(transaction.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-
-            {/* Investment Performance */}
-            <Card title="Investment Performance">
-              <ul className="space-y-3">
-                {userData.investmentPerformance.map(investment => (
-                  <li key={investment.name} className="flex items-center justify-between">
-                    <span className="font-medium">{investment.name}</span>
-                    <div className="text-right">
-                      <p className="font-semibold">${investment.value.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
-                      <p className={`text-sm ${investment.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {investment.change >= 0 ? '↑' : '↓'} {Math.abs(investment.change)}%
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </div>
-        )}
-
-        {/* Placeholder content for other sections */}
-        {activeSection !== 'overview' && (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <h2 className="text-xl font-semibold mb-4">{activeSection.charAt(0).toUpperCase() + activeSection.slice(1)} Section</h2>
-            <p className="text-gray-500">This is the {activeSection} section of your financial dashboard.</p>
-          </div>
-        )}
+        </header>
+        
+        {/* Page content */}
+        <main className="p-6">
+          {activePage === "dashboard" ? (
+            renderDashboardContent()
+          ) : (
+            <div className="bg-white p-6 rounded-lg shadow text-center">
+              <h3 className="text-xl mb-4 capitalize">{activePage} Page</h3>
+              <p className="text-gray-500">This is a placeholder for the {activePage} page content.</p>
+            </div>
+          )}
+        </main>
       </div>
     </div>
   );
 };
 
-export default FinanceDashboard;
+export default FinancialDashboard;
