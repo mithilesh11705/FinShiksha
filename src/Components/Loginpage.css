@@ -7,7 +7,7 @@
   padding-bottom: 30px;
   width: 600px;
   border-radius: 20px;
-  margin-bottom:90px;
+  margin-bottom: 90px;
 }
 .Header {
   display: flex;
@@ -120,7 +120,7 @@
   border: none;
   outline: none;
   padding-left: 10px;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 /* Responsive styling for the dropdown */
@@ -163,4 +163,47 @@
 .submit.disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+.redirect-link {
+  margin-top: 10px;
+  text-align: center;
+  color: #797979;
+  font-size: 20px;
+}
+
+.redirect-link span {
+  color: #4c00b4;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.new-user-text {
+  margin-right: 20px;
+  color: #797979;
+  font-size: 20px;
+  cursor: default;
+}
+
+.new-user-text span {
+  color: #4c00b4;
+  cursor: pointer;
+  font-weight: 600;
+}
+.role-label {
+  margin: 4px;
+  color: #797979;
+  font-size: 18px;
+  font-weight: 400;
+  padding: 4px;
+}
+
+.role-dropdown {
+  flex: 1;
+  height: 30px;
+  border: none;
+  outline: none;
+  color: #797979;
+  font-size: 20px;
+  background: transparent;
+  border-bottom: 1px solid #999;
 }
