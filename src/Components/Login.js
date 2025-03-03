@@ -4,6 +4,7 @@ import password_icon from "../images/password.png";
 import person_icon from "../images/person.png";
 import { useState } from "react";
 import Header from "./Header";
+
 function Login() {
   const [action, setAction] = useState("Login");
   
@@ -11,13 +12,21 @@ function Login() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    password: ""
+    password: "",
+    userType: "student" // Default user type
   });
   
   // State for form validation and API response
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiResponse, setApiResponse] = useState(null);
+
+  // User type options
+  const userTypes = [
+    { value: "student", label: "Student" },
+    { value: "parent", label: "Parent" },
+    { value: "admin", label: "Administrator" }
+  ];
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -56,6 +65,10 @@ function Login() {
       newErrors.password = "Password must be at least 6 characters";
     }
     
+    if (!formData.userType) {
+      newErrors.userType = "Please select a user type";
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -84,8 +97,14 @@ function Login() {
       // For demo purposes, simulate API response
       const simulatedResponse = {
         success: true,
-        message: action === "Login" ? "Login successful" : "Account created successfully",
-        user: { id: "123", email: formData.email }
+        message: action === "Login" 
+          ? `${formData.userType} login successful` 
+          : `${formData.userType} account created successfully`,
+        user: { 
+          id: "123", 
+          email: formData.email,
+          userType: formData.userType 
+        }
       };
       
       // Store user data in localStorage or sessionStorage
@@ -95,8 +114,9 @@ function Login() {
         // You could also use context API or Redux for global state management
         console.log("User authenticated:", simulatedResponse.user);
         
-        // Redirect to dashboard or home page
-        // window.location.href = "/dashboard";
+        // Redirect to appropriate dashboard based on user type
+        // const dashboardPath = `/dashboard/${formData.userType}`;
+        // window.location.href = dashboardPath;
       }
       
       setApiResponse(simulatedResponse);
@@ -130,7 +150,6 @@ function Login() {
   };
 
   return (
-
     <div className="Container">
       <div className="Header">
         <div className="text">{action}</div>
@@ -183,6 +202,24 @@ function Login() {
             onChange={handleInputChange}
           />
           {errors.password && <div className="error-text">{errors.password}</div>}
+        </div>
+        
+        {/* User Type Dropdown */}
+        <div className="input">
+          <select
+            name="userType"
+            value={formData.userType}
+            onChange={handleInputChange}
+            className="select-input"
+          >
+            <option value="" disabled>Select User Type</option>
+            {userTypes.map(type => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+          {errors.userType && <div className="error-text">{errors.userType}</div>}
         </div>
       </div>
       

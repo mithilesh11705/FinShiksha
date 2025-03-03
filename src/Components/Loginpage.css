@@ -95,3 +95,72 @@
   background: #eaeaea;
   color: #676767;
 }
+
+/* User type dropdown styling */
+.select-input {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  color: #797979;
+  font-size: 14px;
+  padding: 0;
+}
+
+.select-input option {
+  background-color: white;
+  color: #333;
+  padding: 8px;
+}
+
+/* Customizing the dropdown appearance to match other inputs */
+.input select {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  padding-left: 10px;
+  font-size: 14px;
+}
+
+/* Responsive styling for the dropdown */
+@media (max-width: 480px) {
+  .select-input {
+    font-size: 12px;
+  }
+}
+
+/* Style for the response message */
+.response-message {
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.response-message.success {
+  background-color: rgba(0, 128, 0, 0.1);
+  color: green;
+  border: 1px solid green;
+}
+
+.response-message.error {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: red;
+  border: 1px solid red;
+}
+
+/* Error text styling */
+.error-text {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+  padding-left: 30px;
+}
+
+/* Disabled button styling */
+.submit.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

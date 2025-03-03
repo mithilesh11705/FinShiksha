@@ -5,8 +5,8 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="h-navbar">
-      <div className="nv-container">
+    <nav className="ha-navbar">
+      <div className="nva-container">
         <a href="https://flowbite.com/" className="logo">
           <img
             src="https://flowbite.com/docs/images/logo.svg"

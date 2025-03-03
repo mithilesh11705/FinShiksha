@@ -8,7 +8,6 @@ import Dashboard from "./Components/Dashboard";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import Footer from "./Components/Footer";
 
-
 const AppLayout = () => {
   return (
     <div className="app">
@@ -48,7 +47,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
      <RouterProvider router={router}>
-      <AppLayout />
+      <AppLayout/>
     </RouterProvider>
   </React.StrictMode>
 );
