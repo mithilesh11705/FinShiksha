@@ -16,7 +16,11 @@ def create_initial_data(user_datastore : SQLAlchemySessionUserDatastore):
     # creating initial data
 
     if not user_datastore.find_user(email = "admin@iitm.ac.in"):
+<<<<<<< HEAD
         user_datastore.create_user(email = "admin@iitm.ac.in", password = hash_password("pass123"), roles=['admin'],active = True)
+=======
+        user_datastore.create_user(email = "admin@iitm.ac.in", password =hash_password("pass"), roles=['admin'],active = True)
+>>>>>>> be99c08a372dc10aa9a14f463c4e9450c1e35130
     if not user_datastore.find_user(email = "staff@iitm.ac.in"):
         user_datastore.create_user(email = "staff@iitm.ac.in", password = hash_password("pass123"), roles=['staff'])
     if not user_datastore.find_user(email = "stud@iitm.ac.in"):

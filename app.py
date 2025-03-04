@@ -1,17 +1,23 @@
 import os
 from flask import Flask
 from flask_restful import Api
+<<<<<<< HEAD
 from flask_cors import CORS  # Import CORS
 from application.config import LocalDevelopmentConfig
 from application.security import security, user_datastore
 from application.database import db
+=======
+from application.database import db,security
+>>>>>>> be99c08a372dc10aa9a14f463c4e9450c1e35130
 from application.initial_data import create_initial_data
 from application.controllers import create_views
+from flask_cors import CORS
+import resources
 
 app = None
-api = None
 
 def create_app():
+<<<<<<< HEAD
     global app, api  # Ensure global variables are modified
     app = Flask(__name__, template_folder="public")
     
@@ -27,12 +33,30 @@ def create_app():
         print("Starting Local Development")
         app.config.from_object(LocalDevelopmentConfig)
     
+=======
+    app = Flask(__name__,template_folder='public')
+
+    # configuration
+    app.config['DEBUG'] = True
+    app.config['SECRET_KEY'] = 'should-not-be-seen'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+    app.config['SECURITY_PASSWORD_SALT'] = 'salty-password'
+    app.config['SECURITY_TOKEN_AUTHENTICATION_HEADER'] = 'Authentication-Token'
+
+    # tell flask to use sql_alchemy db
+>>>>>>> be99c08a372dc10aa9a14f463c4e9450c1e35130
     db.init_app(app)
-    
+
     with app.app_context():
+        from application.models import User, Role
+        from flask_security import SQLAlchemyUserDatastore
+
+        user_datastore = SQLAlchemyUserDatastore(db, User, Role)
         security.init_app(app, user_datastore)
+        
         db.create_all()
         create_initial_data(user_datastore)
+<<<<<<< HEAD
     
     app.config["WTF_CSRF_CHECK_DEFAULT"] = False
     app.config["SECURITY_CSRF_PROTECT_MECHANISMS"] = []
@@ -57,9 +81,29 @@ def create_app():
     create_views(app, user_datastore)
     
     return app, api
+=======
+
+    CORS(app, supports_credentials=True)
+
+    app.config["WTF_CSRF_CHECK_DEFAULT"] = False
+    app.config['SECURITY_CSRF_PROTECT_MECHANISMS'] = []
+    app.config['SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS'] = True
+
+    # setup the view
+    create_views(app,user_datastore)
+
+    # connect flask to flask_restful
+
+    return app
+>>>>>>> be99c08a372dc10aa9a14f463c4e9450c1e35130
 
 from application.api import *
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     app, api = create_app()
     app.run(host='0.0.0.0', port=5000)
+=======
+    app = create_app()
+    app.run(host='0.0.0.0', port=5000)
+>>>>>>> be99c08a372dc10aa9a14f463c4e9450c1e35130
