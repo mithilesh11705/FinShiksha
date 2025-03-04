@@ -30,19 +30,20 @@ class Department(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
     description = db.Column(db.Text)
-    head_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # HOD or Sub-Admin
+    head_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, default=4)  # HOD or Sub-Admin
     head = db.relationship('User', foreign_keys=[head_id])  # Linking to User Table
 
 # Student Table
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
     roll_number = db.Column(db.String, unique=True, nullable=False)
     grade = db.Column(db.String, nullable=False)
     section = db.Column(db.String, nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey('department.id'), nullable=False)
     status = db.Column(db.Enum("Active", "Inactive", "Graduated"), default="Active", nullable=False)
-    name = db.Column(db.String(100),  nullable=False)
+    opted_hostel = db.Column(db.Boolean, default=False, nullable=False)
 
     user = db.relationship('User', foreign_keys=[user_id])  # Student Profile
     department = db.relationship('Department')  # Student's Academic Department
@@ -52,13 +53,12 @@ class Staff(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey('department.id'), nullable=False)
-    name = db.Column(db.String(100),  nullable=False)
-
+    name = db.Column(db.String(100), nullable=False)
     designation = db.Column(db.String(100), nullable=False)  # Role like Teacher, Accountant, Clerk
     salary = db.Column(db.Numeric(10, 2), nullable=False)  # Monthly Salary
     bank_account = db.Column(db.String(50), nullable=False)  # Bank Account Number
     ifsc_code = db.Column(db.String(20), nullable=False)  # Bank IFSC Code
-    status = db.Column(db.Enum("Active", "Inactive", "Retired"), default="Active", nullable=False)
+    status = db.Column(db.Enum("Active", "Inactive", "Retired"), default="Inactive", nullable=False)
     last_paid = db.Column(db.Date, nullable=True)  # Last Salary Payment Date
 
     user = db.relationship('User', foreign_keys=[user_id])  # Staff Profile
@@ -94,3 +94,40 @@ class HostelFees(db.Model):
     mess_deposit = db.Column(db.Numeric(10, 2), nullable=True)
     hostel_caution_money = db.Column(db.Numeric(10, 2), nullable=True)
     total_fees = db.Column(db.Numeric(10, 2), nullable=True)
+
+class FeeDetails(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
+    fee_id = db.Column(db.Integer, db.ForeignKey('fees.id'), nullable=False)
+    status = db.Column(db.Enum("Paid", "Unpaid"), default="Unpaid", nullable=False)
+    total_fees = db.Column(db.Numeric(10, 2), nullable=False)
+    paid_fees = db.Column(db.Numeric(10, 2), nullable=False)
+    pending_fees = db.Column(db.Numeric(10, 2), nullable=False)
+    last_paid_date = db.Column(db.Date, nullable=True)
+    next_due_date = db.Column(db.Date, nullable=True)
+
+    student = db.relationship('Student', foreign_keys=[student_id])
+    fees = db.relationship('Fees', foreign_keys=[fee_id])
+
+class HostelDetails(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
+    hostel_fees_id = db.Column(db.Integer, db.ForeignKey('hostel_fees.id'), nullable=False)
+    status = db.Column(db.Enum("Paid", "Unpaid"), default="Unpaid", nullable=False)
+    last_paid_date = db.Column(db.Date, nullable=True)
+    next_due_date = db.Column(db.Date, nullable=True)
+
+    student = db.relationship('Student', foreign_keys=[student_id])
+    hostel_fees = db.relationship('HostelFees', foreign_keys=[hostel_fees_id])
+
+class Transactions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    transaction_id = db.Column(db.String(255), nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    amount = db.Column(db.Numeric(10, 2), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+
+    sender = db.relationship('User', foreign_keys=[sender_id])
+
+    
