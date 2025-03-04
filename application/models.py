@@ -41,18 +41,53 @@ class Student(db.Model):
     grade = db.Column(db.String, nullable=False)
     section = db.Column(db.String, nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey('department.id'), nullable=False)
-    guardian_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     status = db.Column(db.Enum("Active", "Inactive", "Graduated"), default="Active", nullable=False)
 
     user = db.relationship('User', foreign_keys=[user_id])  # Student Profile
-    guardian = db.relationship('User', foreign_keys=[guardian_id])  # Parent Profile
     department = db.relationship('Department')  # Student's Academic Department
 
-# Parent Table (Optional, if you want a separate model for additional parent details)
-class Parent(db.Model):
+# Staff Table
+class Staff(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, unique=True)
-    phone = db.Column(db.String(15), nullable=True)
-    address = db.Column(db.Text, nullable=True)
-    ward_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=True)
-    user = db.relationship('User', foreign_keys=[user_id])  # Link to User Table
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    department_id = db.Column(db.Integer, db.ForeignKey('department.id'), nullable=False)
+    designation = db.Column(db.String(100), nullable=False)  # Role like Teacher, Accountant, Clerk
+    salary = db.Column(db.Numeric(10, 2), nullable=False)  # Monthly Salary
+    bank_account = db.Column(db.String(50), nullable=False)  # Bank Account Number
+    ifsc_code = db.Column(db.String(20), nullable=False)  # Bank IFSC Code
+    status = db.Column(db.Enum("Active", "Inactive", "Retired"), default="Active", nullable=False)
+    last_paid = db.Column(db.Date, nullable=True)  # Last Salary Payment Date
+
+    user = db.relationship('User', foreign_keys=[user_id])  # Staff Profile
+    department = db.relationship('Department')  # Staff's Academic Department
+
+class Fees(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    department_id = db.Column(db.Integer, db.ForeignKey('department.id'), nullable=False)
+    academic_year = db.Column(db.String(10), nullable=False)  # e.g., "2024-25"
+    year = db.Column(db.Enum("1st", "2nd", "3rd", "4th"), nullable=False)
+    tuition_fees = db.Column(db.Numeric(10, 2), nullable=False)
+    development_fees = db.Column(db.Numeric(10, 2), nullable=False)
+    exam_fees = db.Column(db.Numeric(10, 2), nullable=False)
+    library_fees = db.Column(db.Numeric(10, 2), nullable=False)
+    sports_fees = db.Column(db.Numeric(10, 2), nullable=False)
+    internet_fees = db.Column(db.Numeric(10, 2), nullable=False)
+    placement_fees = db.Column(db.Numeric(10, 2), nullable=False)
+    insurance_fees = db.Column(db.Numeric(10, 2), nullable=False)
+    convocation_fees = db.Column(db.Numeric(10, 2), nullable=True)
+    total_fees = db.Column(db.Numeric(10, 2), nullable=False)
+    one_time_fees = db.Column(db.Numeric(10, 2), nullable=True)
+
+    department = db.relationship('Department')
+
+class HostelFees(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    room_rent = db.Column(db.Numeric(10, 2), nullable=True)
+    electricity_charges = db.Column(db.Numeric(10, 2), nullable=True)
+    water_charges = db.Column(db.Numeric(10, 2), nullable=True)
+    recreation_fees = db.Column(db.Numeric(10, 2), nullable=True)
+    allied_services_fees = db.Column(db.Numeric(10, 2), nullable=True)
+    mess_charges = db.Column(db.Numeric(10, 2), nullable=True)
+    mess_deposit = db.Column(db.Numeric(10, 2), nullable=True)
+    hostel_caution_money = db.Column(db.Numeric(10, 2), nullable=True)
+    total_fees = db.Column(db.Numeric(10, 2), nullable=True)
