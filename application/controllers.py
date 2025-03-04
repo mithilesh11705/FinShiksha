@@ -8,6 +8,10 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from email_validator import validate_email, EmailNotValidError
+from flask_wtf.csrf import CSRFProtect
+
+csrf = CSRFProtect(app)
+
 def create_views(app,user_datastore:SQLAlchemyUserDatastore):
 
     @app.route('/')
@@ -22,82 +26,116 @@ def create_views(app,user_datastore:SQLAlchemyUserDatastore):
             "role": current_user.roles[0].name if current_user.roles else "user"
         }), 200
     
+    from flask import request, jsonify
+
     @app.route('/register', methods=['POST'])
     def register():
         data = request.get_json()
 
+        # Extract common user fields
         email = data.get('email')
         password = data.get('password')
-        role = data.get('role')
-
-        if not email or not password or role not in ['stud','staff']:
-            return jsonify({"message" : "invalid input"})
+        role = data.get('role')  # Must be 'stud' or 'staff'
         
+        if not email or not password or role not in ['stud', 'staff']:
+            return jsonify({"message": "Invalid input"}), 400
+
+        # Validate email format
         try:
             validate_email(email)
         except EmailNotValidError:
-            return jsonify({"message" : "invalid email"})
-        
-        if user_datastore.find_user(email=email):
-            return jsonify({"message":"User already exists"})
-        
-        active = False if role!='stud' else True
-        try:
-            new_user = User(email=email,password=hash_password(password),active=True,roles=[role])
-            db.session.add(new_user)
-            db.session.flush()
+            return jsonify({"message": "Invalid email"}), 400
 
+        # Check if user already exists
+        if user_datastore.find_user(email=email):
+            return jsonify({"message": "User already exists"}), 409
+        print(role)
+        active = (role == 'stud')  # Students are active by default, staff needs approval
+
+        try:
+            # Create User
+            user_datastore.create_user(email=email, password=hash_password(password), active=active)
+            db.session.flush()  # Get new_user.id before committing
+            new_user = User.query.filter_by(email=email).first()
+            # Assign role
+            role_obj = Role.query.filter_by(name="stud" if role == "stud" else "staff").first()
+            if not role_obj:
+                return jsonify({"message": "Role does not exist"}), 400
+            new_user.roles.append(role_obj)
+
+            # Create Student or Staff entry
             if role == 'stud':
-                name = data.get('name')
-                roll_number = data.get('roll_number')
-                grade = data.get('grade')
-                section = data.get('section')
-                department_id = data.get('department_id')
-                new_student = Student(user_id=new_user.id,name=name,roll_number=roll_number,grade=grade,section=section,department_id=department_id)
+                new_student = Student(
+                    user_id=new_user.id,
+                    name=data.get('name'),
+                    roll_number=data.get('roll_number'),
+                    grade=data.get('grade'),
+                    section=data.get('section'),
+                    department_id=data.get('department_id'),
+                    opted_hostel=data.get('opted_hostel', False)
+                )
                 db.session.add(new_student)
-                db.session.flush()
 
             elif role == 'staff':
-                department_id = data.get('department_id')
-                name = data.get('name')
-                designation = data.get('designation')
-                salary = data.get('salary')
-                bank_account = data.get('bank_account')
-                ifsc_code = data.get('ifsc_code')
-                new_staff = Staff(user_id=new_user.id,department_id=department_id,name=name,designation=designation,salary=salary,bank_account=bank_account,ifsc_code=ifsc_code)
+                new_staff = Staff(
+                    user_id=new_user.id,
+                    name=data.get('name'),
+                    department_id=data.get('department_id'),
+                    designation=data.get('designation'),
+                    salary=data.get('salary'),
+                    bank_account=data.get('bank_account'),
+                    ifsc_code=data.get('ifsc_code'),
+                    status="Inactive"  # Staff is inactive until approved
+                )
                 db.session.add(new_staff)
-                db.session.flush()
+
             db.session.commit()
-        except:
-            print('error while creating')
+            return jsonify({"message": "User created successfully"}), 201
+
+        except Exception as e:
             db.session.rollback()
-            return jsonify({"message":"error while creating user"}), 408
-        
-        return jsonify({"message" : "user created"}), 200
+            print(f"Error while creating user: {str(e)}")  # Debugging error log
+            return jsonify({"message": "Error while creating user"}), 500
 
     @app.route('/add-department', methods=['POST'])
     @roles_required('admin')
+    @auth_required("session")
+    @csrf.exempt
     def add_department():
+        if not current_user.is_authenticated:
+            return jsonify({"message": "Unauthorized"}), 403
+        
+        print(f"Authenticated User: {current_user.email}")  # Debugging print
+        
         data = request.get_json()
         name = data.get('name')
         description = data.get('description')
-        head_id = data.get('head_id')
-        if not name or not description or not head_id:
-            return jsonify({"message" : "invalid input"})
-        try:
-            new_department = Department(name=name,description=description,head_id=head_id)
-            db.session.add(new_department)
-            db.session.flush()
-            #assign hod
-            hod = User.query.filter_by(id=head_id).first()
-            hod.roles = ['hod','staff']
-            db.session.commit()
-        except:
-            print('error while creating')
-            db.session.rollback()
-            return jsonify({"message":"error while creating department"}), 408
         
-        return jsonify({"message" : "department created"}), 200
+        if not name or not description:
+            return jsonify({"message": "Invalid input"}), 400
+        
+        try:
+            head_id = 4  # Default HOD (modify logic as needed)
+            new_department = Department(name=name, description=description)
+            db.session.add(new_department)
+            
+            # Assign HOD
+            hod = User.query.filter_by(id=head_id).first()
+            if hod:
+                hod_role = Role.query.filter_by(name="hod").first()
+                staff_role = Role.query.filter_by(name="staff").first()
+                if hod_role and staff_role:
+                    hod.roles.append(hod_role)
+                    hod.roles.append(staff_role)
+            
+            db.session.commit()
+        except Exception as e:
+            print(f"Error while creating: {str(e)}")
+            db.session.rollback()
+            return jsonify({"message": "Error while creating department"}), 500
+        
+        return jsonify({"message": "Department created successfully"}), 200
+
     
     @app.route('/add-fees', methods=['POST'])
     @roles_required('admin')
