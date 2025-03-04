@@ -7,7 +7,9 @@ import FinshikshaLanding from "./Components/FinshikshaLanding";
 import Dashboard from "./Components/Dashboard";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import Footer from "./Components/Footer";
-
+import SignUp from "./Components/Signup";
+import StudentDashboard from "./Components/StudentDashboard";
+import AdminDashboard from "./Components/AdminDashboard";
 const AppLayout = () => {
   return (
     <div className="app">
@@ -32,10 +34,21 @@ const router = createBrowserRouter([
         element: <Login/>
       },
       {
+        path: "/signup",
+        element: <SignUp/>
+      },
+      {
         path: "/dashboard",
         element: <Dashboard />,
       },
-     
+      {
+        path: "/studentd",
+        element: <StudentDashboard />,
+      },
+      {
+        path: "/admind",
+        element: <AdminDashboard />,
+      },
     ],
   },
 ]);
