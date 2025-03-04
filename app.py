@@ -5,7 +5,7 @@ from application.database import db,security
 from application.initial_data import create_initial_data
 from application.controllers import create_views
 from flask_cors import CORS
-import resources
+
 
 app = None
 

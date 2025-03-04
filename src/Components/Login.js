@@ -50,11 +50,11 @@ function Login() {
       localStorage.setItem("userRole", userInfo.role); // Store role in localStorage
       // Step 3: Redirect based on role
       if (userInfo.role === "admin") {
-        navigate("/admin-dashboard");
+        navigate("/admind");
       } else if (userInfo.role === "staff") {
-        navigate("/staff-dashboard");
+        navigate("/staffd");
       } else if (userInfo.role === "stud") {
-        navigate("/student-dashboard");
+        navigate("/studentd");
       } else if (userInfo.role === "hod") {
         navigate("/hod-dashboard");
       }

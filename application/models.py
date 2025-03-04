@@ -42,6 +42,7 @@ class Student(db.Model):
     section = db.Column(db.String, nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey('department.id'), nullable=False)
     status = db.Column(db.Enum("Active", "Inactive", "Graduated"), default="Active", nullable=False)
+    name = db.Column(db.String(100),  nullable=False)
 
     user = db.relationship('User', foreign_keys=[user_id])  # Student Profile
     department = db.relationship('Department')  # Student's Academic Department
@@ -51,6 +52,8 @@ class Staff(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey('department.id'), nullable=False)
+    name = db.Column(db.String(100),  nullable=False)
+
     designation = db.Column(db.String(100), nullable=False)  # Role like Teacher, Accountant, Clerk
     salary = db.Column(db.Numeric(10, 2), nullable=False)  # Monthly Salary
     bank_account = db.Column(db.String(50), nullable=False)  # Bank Account Number

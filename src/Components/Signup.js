@@ -6,205 +6,106 @@ import { useNavigate } from "react-router-dom";
 
 function SignUp() {
   const navigate = useNavigate();
-
-  // State to store user input
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    role: "stud", // Default user type
   });
 
-  // State for form validation and API response
   const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiResponse, setApiResponse] = useState(null);
 
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
 
-    // Clear error when user types
     if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: "",
-      });
+      setErrors({ ...errors, [name]: "" });
     }
   };
 
-  // Validate form data
+  // Validate form fields
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
-    }
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Invalid email format";
 
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
+    if (!formData.password.trim()) newErrors.password = "Password is required";
+    else if (formData.password.length < 6)
       newErrors.password = "Password must be at least 6 characters";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   // Handle form submission
-  const handleSubmit = async () => {
-    if (!validateForm()) {
-      return;
-    }
+  const handleSubmit = () => {
+    if (!validateForm()) return;
 
-    setIsSubmitting(true);
+    // Save user details to localStorage
+    localStorage.setItem("signupData", JSON.stringify(formData));
 
-    try {
-      const response = await fetch("http://localhost:5000/register", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json" 
-        },
-        body: JSON.stringify(formData),
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      if (data.success) {
-        // Store user in localStorage
-        const userForStorage = {
-          id: data.userId || data.id,
-          email: formData.email,
-          userType: formData.userType,
-        };
-        localStorage.setItem("user", JSON.stringify(userForStorage));
-
-        setApiResponse({
-          success: true,
-          message: "Account created successfully! Redirecting...",
-        });
-
-        // Redirect after short delay
-        setTimeout(() => {
-          redirectBasedOnRole(formData.userType);
-        }, 1500);
-      } else {
-        setApiResponse({
-          success: false,
-          message: data.message || "Registration failed. Please try again.",
-        });
-      }
-    } catch (error) {
-      setApiResponse({
-        success: false,
-        message: error.message || "An error occurred. Please try again.",
-      });
-      console.error("Authentication error:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Function to redirect user based on role
-  const redirectBasedOnRole = (userType) => {
-    if (userType === "admin") {
-      navigate("/admin/dashboard");
-    } else if (userType === "student") {
-      navigate("/dashboard");
-    } else {
-      // Default fallback
-      navigate("/dashboard");
-    }
-  };
-
-  // Handle redirect to login page
-  const handleRedirectToLogin = () => {
-    navigate("/login");
+    // Redirect to additional details page
+    navigate("/details");
   };
 
   return (
-    <div className="Container">
-      <div className="Header">
-        <div className="text">Sign Up</div>
-        <div className="underline"></div>
-      </div>
+    <div className="signup-container">
+      <h2>Sign Up</h2>
 
-      {/* Show API response messages */}
       {apiResponse && (
-        <div
-          className={`response-message ${
-            apiResponse.success ? "success" : "error"
-          }`}
-        >
+        <p className={`response ${apiResponse.success ? "success" : "error"}`}>
           {apiResponse.message}
-        </div>
+        </p>
       )}
 
-      <div className="Inputs">
-        <div className="input">
-          <img src={email_icon} alt="" />
-          <input
-            type="email"
-            placeholder="Email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-          />
-          {errors.email && <div className="error-text">{errors.email}</div>}
-        </div>
-
-        <div className="input">
-          <img src={password_icon} alt="" />
-          <input
-            type="password"
-            placeholder="Password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-          />
-          {errors.password && (
-            <div className="error-text">{errors.password}</div>
-          )}
-        </div>
-
-        <div className="input">
-          <label className="role-label">Select Role:</label>
-          <select
-            name="userType"
-            value={formData.userType}
-            onChange={handleInputChange}
-            className="role-dropdown"
-          >
-            <option value="student">Student</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
+      <div className="form-group">
+        <label>Email</label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleInputChange}
+        />
+        {errors.email && <p className="error">{errors.email}</p>}
       </div>
 
-      <div className="redirect-link">
-        Already have an account?{" "}
-        <span onClick={handleRedirectToLogin}>Login here</span>
+      <div className="form-group">
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleInputChange}
+        />
+        {errors.password && <p className="error">{errors.password}</p>}
       </div>
 
-      <div className="submit-container">
-        <div></div>
-        <div
-          className={`submit ${isSubmitting ? "disabled" : ""}`}
-          onClick={handleSubmit}
+      {/* <div className="form-group">
+        <label>Confirm Password</label>
+        <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} />
+        {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
+      </div> */}
+
+      <div className="form-group">
+        <label>User Type</label>
+        <select
+          name="userType"
+          value={formData.userType}
+          onChange={handleInputChange}
         >
-          {isSubmitting ? "Processing..." : "Sign Up"}
-        </div>
+          <option value="student">stud</option>
+
+          <option value="staff">staff</option>
+        </select>
       </div>
+
+      <button className="submit-button" onClick={handleSubmit}>
+        Sign Up
+      </button>
     </div>
   );
 }

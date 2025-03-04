@@ -10,12 +10,14 @@ import Footer from "./Components/Footer";
 import SignUp from "./Components/Signup";
 import StudentDashboard from "./Components/StudentDashboard";
 import AdminDashboard from "./Components/AdminDashboard";
+import AdditionalDetailsForm from "./Components/AdditionalDetailsForm";
+
 const AppLayout = () => {
   return (
     <div className="app">
       <App />
       <Outlet />
-      <Footer/>
+      <Footer />
     </div>
   );
 };
@@ -27,15 +29,15 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <FinshikshaLanding/>,
+        element: <FinshikshaLanding />,
       },
       {
         path: "/login",
-        element: <Login/>
+        element: <Login />,
       },
       {
         path: "/signup",
-        element: <SignUp/>
+        element: <SignUp />,
       },
       {
         path: "/dashboard",
@@ -49,18 +51,19 @@ const router = createBrowserRouter([
         path: "/admind",
         element: <AdminDashboard />,
       },
+      {
+        path: "/details",
+        element: <AdditionalDetailsForm />,
+      },
     ],
   },
 ]);
 
-
-
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-     <RouterProvider router={router}>
-      <AppLayout/>
+    <RouterProvider router={router}>
+      <AppLayout />
     </RouterProvider>
   </React.StrictMode>
 );

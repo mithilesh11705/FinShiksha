@@ -48,21 +48,23 @@ def create_views(app,user_datastore:SQLAlchemyUserDatastore):
             db.session.flush()
 
             if role == 'stud':
+                name = data.get('name')
                 roll_number = data.get('roll_number')
                 grade = data.get('grade')
                 section = data.get('section')
                 department_id = data.get('department_id')
-                new_student = Student(user_id=new_user.id,roll_number=roll_number,grade=grade,section=section,department_id=department_id)
+                new_student = Student(user_id=new_user.id,name=name,roll_number=roll_number,grade=grade,section=section,department_id=department_id)
                 db.session.add(new_student)
                 db.session.flush()
 
             elif role == 'staff':
                 department_id = data.get('department_id')
+                name = data.get('name')
                 designation = data.get('designation')
                 salary = data.get('salary')
                 bank_account = data.get('bank_account')
                 ifsc_code = data.get('ifsc_code')
-                new_staff = Staff(user_id=new_user.id,department_id=department_id,designation=designation,salary=salary,bank_account=bank_account,ifsc_code=ifsc_code)
+                new_staff = Staff(user_id=new_user.id,department_id=department_id,name=name,designation=designation,salary=salary,bank_account=bank_account,ifsc_code=ifsc_code)
                 db.session.add(new_staff)
                 db.session.flush()
             db.session.commit()
